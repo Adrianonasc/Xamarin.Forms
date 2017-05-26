@@ -13,5 +13,20 @@ namespace XamarinApp
         {
             InitializeComponent();
         }
+
+        private void btnTeste1_Clicked(object sender, EventArgs e)
+        {
+            lblResult.Text = "btnTeste1_Clicked";
+        }
+
+        private void btnTeste2_Clicked(object sender, EventArgs e)
+        {
+            lblResult.Text = "btnTeste2_Clicked";
+        }
+
+        private void btnTeste3_Clicked(object sender, EventArgs e)
+        {
+            lblResult.Text = "btnTeste3_Clicked";
+        }
     }
 }

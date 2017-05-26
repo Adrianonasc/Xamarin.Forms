@@ -3,9 +3,12 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:local="clr-namespace:XamarinApp"
              x:Class="XamarinApp.MainPage">
-
-	<Label Text="Welcome to Xamarin Forms!" 
-           VerticalOptions="Center" 
-           HorizontalOptions="Center" />
-
+    
+    <StackLayout VerticalOptions="Start" BackgroundColor="AliceBlue" >
+        <Button x:Name="btnTeste1" Text="Teste 1" Margin="20,0"  Clicked="btnTeste1_Clicked"></Button>
+        <Button x:Name="btnTeste2" Text="Teste 2" Margin="20,0"  Clicked="btnTeste2_Clicked"></Button>
+        <Button x:Name="btnTeste3" Text="Teste 3" Margin="20,0" Clicked="btnTeste3_Clicked"></Button>
+        <Label x:Name="lblResult" Text="Teste" Margin="20,0" ></Label>
+    </StackLayout>
+    
 </ContentPage>
