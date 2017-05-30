@@ -4,11 +4,11 @@
              xmlns:local="clr-namespace:XamarinApp"
              x:Class="XamarinApp.MainPage">
     
-    <StackLayout VerticalOptions="Start" BackgroundColor="AliceBlue" >
+    <StackLayout VerticalOptions="Start" >
         <Button x:Name="btnTeste1" Text="Teste 1" Margin="20,0"  Clicked="btnTeste1_Clicked"></Button>
         <Button x:Name="btnTeste2" Text="Teste 2" Margin="20,0"  Clicked="btnTeste2_Clicked"></Button>
         <Button x:Name="btnTeste3" Text="Teste 3" Margin="20,0" Clicked="btnTeste3_Clicked"></Button>
-        <Label x:Name="lblResult" Text="Teste" Margin="20,0" ></Label>
+        <Label x:Name="lblResult" Text="Teste" Margin="0,30" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" ></Label>
     </StackLayout>
     
 </ContentPage>
