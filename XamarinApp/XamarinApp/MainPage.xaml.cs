@@ -6,6 +6,8 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using Newtonsoft.Json;
 using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
 
 namespace XamarinApp
 {
@@ -13,9 +15,10 @@ namespace XamarinApp
     {
         Stopwatch watch = Stopwatch.StartNew();
         int[] arrQuantRegistro = new int[] { 10, 25, 50, 75, 100, 250, 1000 };
-        double[] arrTempoExecucao = new double[7];
+        int[] arrTempoExecucao = new int[7];
         int indexQuantidadeRegisto = 0;
         int[] dimencoes = new int[] { 40, 80, 100, 250, 500, 750, 1000 };
+        SQLiteHelpers db = new SQLiteHelpers();
 
         public MainPage()
         {
@@ -31,6 +34,8 @@ namespace XamarinApp
         {
             if (indexQuantidadeRegisto >= arrQuantRegistro.Length)
             {
+                foreach (var item in arrTempoExecucao)
+                    Debug.WriteLine(item.ToString(CultureInfo.CurrentCulture));
                 indexQuantidadeRegisto = 0;
                 return;
             }
@@ -40,31 +45,28 @@ namespace XamarinApp
             Usuario usuario;
             Byte[] b = new Byte[100];
             Random rnd = new Random();
-            using (var db = new SQLiteHelpers())
+            watch.Start();
+            for (int i = 0; i < arrQuantRegistro[indexQuantidadeRegisto]; i++)
             {
-                watch.Start();
-                for (int i = 0; i < arrQuantRegistro[indexQuantidadeRegisto]; i++)
+                rnd.NextBytes(b);
+                usuario = new Usuario()
                 {
-                    rnd.NextBytes(b);
-                    usuario = new Usuario()
-                    {
-                        Id = i,
-                        Nome = "Nome " + i,
-                        Idade = i,
-                        salario = i * 10,
-                        Foto = b
-                    };
-                    b = new Byte[100];
-                    db.InserirCliente(usuario);
-                }
-                watch.Stop();
-                arrTempoExecucao[indexQuantidadeRegisto] = watch.Elapsed.TotalMilliseconds;
-                watch.Reset();
-                indexQuantidadeRegisto++;
-            }
+                    Id = i,
+                    Nome = "Nome " + i,
+                    Idade = i,
+                    salario = i * 10,
+                    Foto = b
+                };
+                b = new Byte[100];
+                db.InserirCliente(usuario);
 
+            }
+            watch.Stop();
+            arrTempoExecucao[indexQuantidadeRegisto] = watch.Elapsed.Milliseconds;
+            watch.Reset();
+            indexQuantidadeRegisto++;
             PosTeste();
-            this.exibirTempo();
+            exibirTempo();
         }
 
         /// <summary>
@@ -82,32 +84,30 @@ namespace XamarinApp
         {
             if (indexQuantidadeRegisto >= arrQuantRegistro.Length)
             {
+                foreach (var item in arrTempoExecucao)
+                    Debug.WriteLine(item.ToString(CultureInfo.CurrentCulture));
                 indexQuantidadeRegisto = 0;
                 return;
             }
             PreTeste();
 
             var client = new HttpClient();
-            string uri = "http://webapiadrtcc.azurewebsites.net/api/Usuarios/"+ arrQuantRegistro[indexQuantidadeRegisto];
+            string uri = "http://webapiadrtcc.azurewebsites.net/api/Usuarios/" + (arrQuantRegistro[indexQuantidadeRegisto] - 1);
             client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
             watch.Start();
             var result = await client.GetAsync(uri);
             string json = await result.Content.ReadAsStringAsync();
             var usuarios = JsonConvert.DeserializeObject<List<Usuario>>(json);
-            using (var db = new SQLiteHelpers())
+            foreach (var usuario in usuarios)
             {
-                foreach (var usuario in usuarios)
-                {
-                    db.InserirCliente(usuario);
-                }
-
-                watch.Stop();
-                arrTempoExecucao[indexQuantidadeRegisto] = watch.Elapsed.TotalMilliseconds;
-                watch.Reset();
-                indexQuantidadeRegisto++;
+                db.InserirCliente(usuario);
             }
+            watch.Stop();
+            arrTempoExecucao[indexQuantidadeRegisto] = watch.Elapsed.Milliseconds;
+            indexQuantidadeRegisto++;
+            watch.Reset();
             PosTeste();
-            this.exibirTempo();
+            exibirTempo();
 
         }
 
@@ -122,9 +122,12 @@ namespace XamarinApp
             foreach (int dimencao in dimencoes)
             {
                 this.MultiplicarMatrizes(dimencao);
-                Debug.WriteLine($"Tempo Total Multiplicação de Matriz:  {watch.Elapsed.TotalMilliseconds}");
+                arrTempoExecucao[indexQuantidadeRegisto] = watch.Elapsed.Milliseconds;
+                indexQuantidadeRegisto++;
             }
+            indexQuantidadeRegisto = 0;
             lblResult.Text = "Teste Finalizado";
+            exibirTempo();
         }
 
         #region Multiplicação de matriz
@@ -148,8 +151,7 @@ namespace XamarinApp
 
             for (int i = 0; i < Dimensao; i++)
                 for (int j = 0; j < Dimensao; j++)
-                    for (int k = 0; k < Dimensao; k++)
-                        matrizResult[i, j] += matriz1[i, k] * matriz2[k, j];
+                     matrizResult[i, j] += matriz1[i, j] * matriz2[i, j];
 
             watch.Stop();
 
@@ -171,19 +173,13 @@ namespace XamarinApp
 
         public void PosTeste()
         {
-            using (var db = new SQLiteHelpers())
-            {
-                Debug.WriteLine($"Total Resgistros:  {db.CountRegistro()}");
-            }
+          Debug.WriteLine($"Total Resgistros:  {db.CountRegistro()}");
         }
 
         public void PreTeste()
         {
-            using (var db = new SQLiteHelpers())
-            {
-                db.dropTb();
-                db.CreateTb();
-            }
+           db.dropTb();
+           db.CreateTb();
         }
     }
 }

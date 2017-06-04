@@ -19,6 +19,7 @@ namespace XamarinApp
             var config = DependencyService.Get<IConfig>();
             string fullPath = Path.Combine(config.PathSQLite, fileDB);
             connDB = new SQLiteConnection(config.Plataforma, fullPath);
+            connDB.TimeExecution = true;
         }
 
         public void InserirCliente(Usuario usuario)
